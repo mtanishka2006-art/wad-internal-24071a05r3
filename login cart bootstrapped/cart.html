@@ -25,39 +25,75 @@
 </nav>
 <div class="container mt-4">
 	<h4 class="text-center mb-4">Your Shopping Cart</h4>
-	<div class="row g-4 justify-content-center">
-		<div class="col-md-4">
-			<div class="card h-100 text-center">
-				<img src="https://m.media-amazon.com/images/I/717Q2swzhBL.jpg" class="img-fluid mx-auto mt-3" style="height:200px;object-fit:contain;">
-				<div class="card-body">
-					<h6>Samsung Galaxy S25 Ultra</h6>
-					<p>₹1,30,000</p>
-					<p>Qty: 1</p>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-4">
-			<div class="card h-100 text-center">
-				<img src="https://m.media-amazon.com/images/I/61giwQtR1qL._AC_UF1000,1000_QL80_.jpg" class="img-fluid mx-auto mt-3" style="height:200px;object-fit:contain;">
-				<div class="card-body">
-					<h6>iPhone 16 Pro Max</h6>
-					<p>₹1,15,000</p>
-					<p>Qty: 1</p>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-4">
-			<div class="card h-100 text-center">
-				<img src="https://image01-in.oneplus.net/media/202412/17/052a246708df8233d079b3502aeeb327.png" class="img-fluid mx-auto mt-3" style="height:200px;object-fit:contain;">
-				<div class="card-body">
-					<h6>OnePlus 13</h6>
-					<p>₹70,000</p>
-					<p>Qty: 1</p>
-				</div>
-			</div>
-		</div>
+	<div class="text-end mb-3">
+		<button class="btn btn-outline-dark" id="logout">Logout</button>
+	</div>
+	<div id="cartItems" class="row g-4 justify-content-center">
+		<!-- Items will be populated here -->
+	</div>
+	<div class="text-center mt-4">
+		<h5>Total: ₹<span id="total">0</span></h5>
+		<button class="btn btn-success" id="checkout">Checkout</button>
 	</div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+if (!localStorage.getItem('currentUser')) {
+	window.location.href = 'login.html';
+}
+
+function renderCart() {
+	const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+	const cartItems = document.getElementById('cartItems');
+	cartItems.innerHTML = '';
+	let total = 0;
+	cart.forEach((item, index) => {
+		total += item.price * item.qty;
+		const col = document.createElement('div');
+		col.className = 'col-md-4';
+		col.innerHTML = `
+			<div class="card h-100 text-center">
+				<img src="${item.img}" class="img-fluid mx-auto mt-3" style="height:200px;object-fit:contain;">
+				<div class="card-body">
+					<h6>${item.name}</h6>
+					<p>₹${item.price.toLocaleString()}</p>
+					<p>Qty: ${item.qty}</p>
+					<button class="btn btn-danger btn-sm remove-item" data-index="${index}">Remove</button>
+				</div>
+			</div>
+		`;
+		cartItems.appendChild(col);
+	});
+	document.getElementById('total').textContent = total.toLocaleString();
+}
+
+document.addEventListener('DOMContentLoaded', renderCart);
+
+document.getElementById('cartItems').addEventListener('click', function(e) {
+	if (e.target.classList.contains('remove-item')) {
+		const index = e.target.getAttribute('data-index');
+		let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+		cart.splice(index, 1);
+		localStorage.setItem('cart', JSON.stringify(cart));
+		renderCart();
+	}
+});
+
+document.getElementById('checkout').addEventListener('click', function() {
+	const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+	if (cart.length === 0) {
+		alert('Cart is empty');
+		return;
+	}
+	alert('Checkout successful! Total: ₹' + document.getElementById('total').textContent);
+	localStorage.removeItem('cart');
+	renderCart();
+});
+
+document.getElementById('logout').addEventListener('click', function() {
+	localStorage.removeItem('currentUser');
+	window.location.href = 'login.html';
+});
+</script>
 </body>
 </html>

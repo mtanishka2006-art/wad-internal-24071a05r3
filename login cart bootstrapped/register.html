@@ -29,19 +29,45 @@
 			<div class="card shadow">
 				<div class="card-body">
 					<h4 class="text-center mb-3">User Registration</h4>
-					<input class="form-control mb-2" placeholder="Full Name">
-					<input class="form-control mb-2" placeholder="Email">
-					<input class="form-control mb-2" placeholder="Username">
-					<input type="password" class="form-control mb-2" placeholder="Password">
-					<input class="form-control mb-2" placeholder="Phone">
-					<input class="form-control mb-3" placeholder="Address">
-					<button class="btn btn-dark w-100 mb-2">Register</button>
-					<button class="btn btn-secondary w-100">Reset</button>
+					<form id="registerForm">
+						<input class="form-control mb-2" placeholder="Full Name" id="fullName" required>
+						<input type="email" class="form-control mb-2" placeholder="Email" id="email" required>
+						<input class="form-control mb-2" placeholder="Username" id="username" required>
+						<input type="password" class="form-control mb-2" placeholder="Password" id="password" required>
+						<input class="form-control mb-2" placeholder="Phone" id="phone" required>
+						<input class="form-control mb-3" placeholder="Address" id="address" required>
+						<button type="submit" class="btn btn-dark w-100 mb-2">Register</button>
+						<button type="reset" class="btn btn-secondary w-100">Reset</button>
+					</form>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+if (localStorage.getItem('currentUser')) {
+	window.location.href = 'catalog.html';
+}
+
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+	e.preventDefault();
+	const fullName = document.getElementById('fullName').value;
+	const email = document.getElementById('email').value;
+	const username = document.getElementById('username').value;
+	const password = document.getElementById('password').value;
+	const phone = document.getElementById('phone').value;
+	const address = document.getElementById('address').value;
+	const users = JSON.parse(localStorage.getItem('users') || '[]');
+	if (users.find(u => u.username === username)) {
+		alert('Username already exists');
+		return;
+	}
+	users.push({ fullName, email, username, password, phone, address });
+	localStorage.setItem('users', JSON.stringify(users));
+	alert('Registration successful');
+	window.location.href = 'login.html';
+});
+</script>
 </body>
 </html>
